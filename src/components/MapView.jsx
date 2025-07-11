@@ -43,11 +43,11 @@ function CheckMarkers({ controlState, setControlState }) {
   )
 }
 
-function ZoomAwareIcon({ index, controlState, setControlState }) {
+function ZoomAwareIcon({ index, controlState, setControlState, sortedControls }) {
   const map = useMap();
-  const control = controlState.controls[index];
   const [zoom, setZoom] = useState(map.getZoom());
-  index = index + 1;
+  const control = sortedControls[index];
+  //if(sortedControls.some((c) => c.type === "start")) index = index - 1
   useEffect(() => {
     const onZoom = () => {
       setZoom(map.getZoom());
@@ -220,7 +220,7 @@ function ControlLines({ sortedControls }) {
       list.push([newBx, newBy]);
     }
 
-    linesList.push(<Polyline positions={list} color='#c01a6e' weight={1} smoothFactor={1} />);
+    linesList.push(<Polyline key={`${i}-${list[0]}`} positions={list} color='#c01a6e' weight={1} smoothFactor={1} />);
   }
   return (
     <>
@@ -229,11 +229,11 @@ function ControlLines({ sortedControls }) {
   );
 }
 
-export default function MapView({ controlState, setControlState, notificationState, setNotificationState }) {
+export default function MapView({ controlState, setControlState, currentCourse, setCurrentCourse, notificationState, setNotificationState }) {
   const handleAddControl = (position) => {
     if (controlState.mode !== 'placing') return;
 
-    if (controlState.selectedItemType === 'start' && controlState.controls.some(c => c.type === 'start')) {
+    if (controlState.selectedItemType === 'start' && currentCourse.controls.some(c => c.type === 'start')) {
       setNotificationState({
         show: true,
         message: 'Only one start control can be placed.',
@@ -241,7 +241,7 @@ export default function MapView({ controlState, setControlState, notificationSta
       return;
     }
 
-    if (controlState.selectedItemType === 'finish' && controlState.controls.some(c => c.type === 'finish')) {
+    if (controlState.selectedItemType === 'finish' && currentCourse.controls.some(c => c.type === 'finish')) {
       setNotificationState({
         show: true,
         message: 'Only one finish control can be placed.',
@@ -249,15 +249,16 @@ export default function MapView({ controlState, setControlState, notificationSta
       return;
     }
 
-    setControlState((prev) => ({
+    setCurrentCourse((prev) => ({
       ...prev,
       controls: [...prev.controls, { type: controlState.selectedItemType, coords: position }],
     }));
   };
+
   const sortedControls = [
-    ...controlState.controls.filter(c => c.type === 'start'),
-    ...controlState.controls.filter(c => c.type === 'control'),
-    ...controlState.controls.filter(c => c.type === 'finish')
+    ...currentCourse.controls.filter(c => c.type === 'start'),
+    ...currentCourse.controls.filter(c => c.type === 'control'),
+    ...currentCourse.controls.filter(c => c.type === 'finish')
   ]
 
   return (
@@ -268,12 +269,12 @@ export default function MapView({ controlState, setControlState, notificationSta
         crs={L.CRS.Simple}
         style={{ height: '100vh', width: '100%' }}
       >
-        <ImageOverlay url={imageUrl} bounds={imageBounds} className='cursor-default'/>
+        <ImageOverlay url={currentCourse.map} bounds={imageBounds} className='cursor-default'/>
         <ControlPlacer onPlace={handleAddControl} />
         <CheckMarkers controlState={controlState} setControlState={setControlState} />
         <MapClickHandler controlState={controlState} setControlState={setControlState} />
         {sortedControls.map(({ coords }, index) => (
-          <ZoomAwareIcon key={`${index}-${controlState.mode}`} index={index} controlState={controlState} setControlState={setControlState} />
+          <ZoomAwareIcon key={`${index}-${controlState.mode}`} index={index} controlState={controlState} setControlState={setControlState} sortedControls={sortedControls} />
         ))}
         <ControlLines sortedControls={sortedControls} />
 

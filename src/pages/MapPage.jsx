@@ -3,7 +3,7 @@ import { useState } from 'react';
 import IconForItem from "../helpers/IconGetter";
 import Notification from "../components/Notification";
 
-function UpperToolbar({ setPage, controlState, setControlState }) {
+function UpperToolbar({ setPage, controlState, setControlState, setCurrentCourse }) {
   const buttonProperties = {
     className: "text-zinc-800 font-semibold py-2 px-4 rounded"
   };
@@ -63,7 +63,7 @@ function UpperToolbar({ setPage, controlState, setControlState }) {
 
         <button {...buttonProperties} onClick={() => {
           if (controlState.selectedControl !== undefined) {
-            setControlState((prev) => ({ ...prev, controls: prev.controls.filter((_, index) => index !== prev.selectedControl), selectedControl: undefined }));
+            setCurrentCourse((prev) => ({ ...prev, controls: prev.controls.filter((_, index) => index !== prev.selectedControl), selectedControl: undefined }));
           }
         }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -86,7 +86,7 @@ function UpperToolbar({ setPage, controlState, setControlState }) {
   )
 }
 
-function MapPage({ setPage, controlState, setControlState, lastAction, setLastAction }) {
+function MapPage({ setPage, controlState, setControlState, currentCourse, setCurrentCourse }) {
   const [notificationState, setNotificationState] = useState({
     show: false,
     message: '',
@@ -94,14 +94,14 @@ function MapPage({ setPage, controlState, setControlState, lastAction, setLastAc
 
   return (
     <div className="flex flex-col justify-between h-screen">
-      <UpperToolbar setPage={setPage} controlState={controlState} setControlState={setControlState} />
+      <UpperToolbar setPage={setPage} controlState={controlState} setControlState={setControlState} setCurrentCourse={setCurrentCourse}/>
       {notificationState.show && (
         <Notification
           message={notificationState.message}
           onClose={() => setNotificationState({ show: false, message: '' })}
         />
       )}
-      <MapView className='h-screen w-full z-40' controlState={controlState} setControlState={setControlState} notificationState={notificationState} setNotificationState={setNotificationState} />
+      <MapView className='h-screen w-full z-40' controlState={controlState} setControlState={setControlState} currentCourse={currentCourse} setCurrentCourse={setCurrentCourse} notificationState={notificationState} setNotificationState={setNotificationState} />
     </div>
   )
 }
