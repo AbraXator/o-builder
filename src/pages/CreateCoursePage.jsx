@@ -40,7 +40,9 @@ function CreateCoursePage({ setPage, setCurrentCourse }) {
 
   const saveForm = async () => {
     console.log("Saving course...")
-    const course = {
+    const course = 
+
+    await saveCourse({
       name: formData.courseName,
       scale: formData.courseScale,
       map: formData.courseMap,
@@ -48,10 +50,11 @@ function CreateCoursePage({ setPage, setCurrentCourse }) {
         type: "",
         coord: []
       }]
-    }
-    
-    await saveCourse(course)
-    setCurrentCourse(course)
+    })
+
+    const courses = await getCourses();
+    courses.sort((a, b) => b.id - a.id);
+    setCurrentCourse(courses[0])
 
     setPage("map")
   }

@@ -22,6 +22,11 @@ export const saveCourse = async (courseData) => {
   });
 };
 
+export const setCourse = async (courseData, id) => {
+  const db = await initDB();
+  await db.put('courses', {...courseData, id})
+}
+
 export const getCourses = async () => {
   const db = await initDB();
   return await db.getAll('courses');
