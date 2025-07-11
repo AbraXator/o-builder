@@ -1,0 +1,15 @@
+<svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className="w-6 h-6"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="11"
+              fill="none"
+              stroke="#ed3288"
+              strokeMiterlimit="10"
+              strokeWidth="2"
+            />
+          </svg>
