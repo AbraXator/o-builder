@@ -3,33 +3,25 @@ import { useState } from 'react';
 import IconForItem from "../helpers/IconGetter";
 import Notification from "../components/Notification";
 import { setCourse } from "../components/IndexedDB"
+import ConfirmationModal from "../components/ConfirmationModal";
+import { exportAsImage, ExportDialog } from "../components/ExportCourse";
 
 function UpperToolbar({ setPage, controlState, setControlState, currentCourse, setCurrentCourse }) {
   const buttonProperties = {
-    className: "text-zinc-800 font-semibold py-2 px-4 rounded"
+    className: "flex-1 text-zinc-800 font-semibold py-2 px-4 rounded"
   };
   const activateAction = (action) => {
     setControlState((prev) => ({ ...prev, mode: prev.mode === action ? null : action }));
   }
-  
-  const saveCurrentCourse = () => {
-    const id = currentCourse.id;
-    setCourse(currentCourse, id)
-    console.log(id)
-  }
 
   return (
     <div className="w-full bg-zinc-100 sticky top-0 z-50">
-      <div className="max-w-screen mx-auto px-4 flex items-center gap-2 justify-between">
-        <button className={`${controlState.mode === 'selecting' ? "bg-zinc-300" : ""} hover:bg-zinc-300 text-zinc-800 font-semibold py-2 px-4 rounded`} onClick={saveCurrentCourse}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /><path d="M7 3v4a1 1 0 0 0 1 1h7" /></svg>
-        </button>
-
-        <button className={`${controlState.mode === 'selecting' ? "bg-zinc-300" : ""} hover:bg-zinc-300 text-zinc-800 font-semibold py-2 px-4 rounded`} onClick={() => activateAction('selecting')}>
+      <div className="w-full mx-auto px-4 flex items-center gap-2 justify-center">
+        <button className={`${controlState.mode === 'selecting' ? "bg-zinc-300" : ""} flex-1 hover:bg-zinc-300 text-zinc-800 font-semibold py-2 px-4 rounded`} onClick={() => activateAction('selecting')}>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pointer-icon lucide-pointer"><path d="M22 14a8 8 0 0 1-8 8" /><path d="M18 11v-1a2 2 0 0 0-2-2a2 2 0 0 0-2 2" /><path d="M14 10V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1" /><path d="M10 9.5V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v10" /><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" /></svg>
         </button>
 
-        <button className={`${controlState.mode === 'placing' ? "bg-zinc-300" : ""} hover:bg-zinc-300 text-zinc-800 font-semibold py-2 px-4 rounded`} onClick={() => activateAction('placing')}>
+        <button className={`${controlState.mode === 'placing' ? "bg-zinc-300" : ""} flex-1 hover:bg-zinc-300 text-zinc-800 font-semibold py-2 px-4 rounded`} onClick={() => activateAction('placing')}>
           <IconForItem selectedItem={controlState.selectedItemType} />
         </button>
 
@@ -97,22 +89,69 @@ function UpperToolbar({ setPage, controlState, setControlState, currentCourse, s
   )
 }
 
+function LowerToolbar({ showModal, setShowModal, setPage, currentCourse, setNotificationState, setShowExportDialog }) {
+  const saveCurrentCourse = () => {
+    const id = currentCourse.id;
+    setCourse(currentCourse, id)
+    setNotificationState({
+      show: true,
+      message: "Course saved succesfully",
+      type: "success"
+    })
+  }
+
+  return (
+    <div className="flex flex-row w-full bg-green p-1">
+      <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={() => setShowModal(true)}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+      </button>
+
+      <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={saveCurrentCourse}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /><path d="M7 3v4a1 1 0 0 0 1 1h7" /></svg>
+      </button>
+
+      <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={() => exportAsImage({ courseToExport: currentCourse })}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M12 12v6" /><path d="m15 15-3-3-3 3" /></svg>    
+      </button>
+    </div>
+  )
+}
+
 function MapPage({ setPage, controlState, setControlState, currentCourse, setCurrentCourse }) {
   const [notificationState, setNotificationState] = useState({
     show: false,
     message: '',
+    type: ''
   });
+  const [showModal, setShowModal] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   return (
-    <div className="flex flex-col justify-between h-screen">
-      <UpperToolbar setPage={setPage} controlState={controlState} setControlState={setControlState} currentCourse={currentCourse} setCurrentCourse={setCurrentCourse} />
+    <div className="flex flex-col justify-between h-[100dvh] overflow-hidden">
+      {showModal && (<ConfirmationModal
+        title={"Exit to main page?"}
+        message={"Any unsaved changes will be lost"}
+        confirmText={"Exit"}
+        onConfirm={() => setPage("main")}
+        onCancel={() => setShowModal(false)} />)}
+      {showExportDialog && (<ExportDialog/>)}
+      <div className="flex-shrink-0">
+        <UpperToolbar setPage={setPage} controlState={controlState} setControlState={setControlState} currentCourse={currentCourse} setCurrentCourse={setCurrentCourse} />
+      </div>
       {notificationState.show && (
         <Notification
           message={notificationState.message}
           onClose={() => setNotificationState({ show: false, message: '' })}
+          type={notificationState.type}
         />
       )}
-      <MapView className='h-screen w-full z-40' controlState={controlState} setControlState={setControlState} currentCourse={currentCourse} setCurrentCourse={setCurrentCourse} notificationState={notificationState} setNotificationState={setNotificationState} />
+      <div className="h-full min-h-0 flex-grow overflow-hidden">
+        <MapView controlState={controlState} setControlState={setControlState} currentCourse={currentCourse} setCurrentCourse={setCurrentCourse} notificationState={notificationState} setNotificationState={setNotificationState} />
+      </div>
+
+      <div className="flex-shrink-0">
+        <LowerToolbar showModal={showModal} setShowModal={setShowModal} setPage={setPage} currentCourse={currentCourse} setNotificationState={setNotificationState} setShowExportDialog={setShowExportDialog} />
+      </div>
     </div>
   )
 }

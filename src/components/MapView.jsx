@@ -2,6 +2,7 @@ import { MapContainer, ImageOverlay, useMapEvent, Marker, useMap, Polyline } fro
 import L from 'leaflet';
 import { useState, useEffect } from 'react';
 import Notification from './Notification';
+import ConfirmationModal from './ConfirmationModal';
 
 const imageUrl = '/maps/mapa.png';
 const imageBounds = [[0, 0], [595, 842]];
@@ -229,6 +230,16 @@ function ControlLines({ sortedControls }) {
   );
 }
 
+function StoreMapInstance() {
+  const map = useMap();
+
+  useEffect(() => {
+    window['map'] = map;
+  }, [map])
+
+  return null;
+}
+
 export default function MapView({ controlState, setControlState, currentCourse, setCurrentCourse, notificationState, setNotificationState }) {
   const handleAddControl = (position) => {
     if (controlState.mode !== 'placing') return;
@@ -237,6 +248,7 @@ export default function MapView({ controlState, setControlState, currentCourse, 
       setNotificationState({
         show: true,
         message: 'Only one start control can be placed.',
+        type: "error"
       });
       return;
     }
@@ -245,6 +257,7 @@ export default function MapView({ controlState, setControlState, currentCourse, 
       setNotificationState({
         show: true,
         message: 'Only one finish control can be placed.',
+        type: "error"
       });
       return;
     }
@@ -262,13 +275,15 @@ export default function MapView({ controlState, setControlState, currentCourse, 
   ]
 
   return (
-    <div>
+    <div className='w-full h-full' id="map-container">
+      <div style={{ backgroundColor: '#f56565', width: '40px', height: '40px', position: 'absolute', top: '40px', left: '40px', zIndex: 9999 }}></div>
       <MapContainer
         center={[500, 500]}
-        zoom={-1}
+        zoom={0}
         crs={L.CRS.Simple}
-        style={{ height: '100vh', width: '100%' }}
+        className="w-full h-full"
       >
+        <StoreMapInstance />
         <ImageOverlay url={currentCourse.map} bounds={imageBounds} className='cursor-default'/>
         <ControlPlacer onPlace={handleAddControl} />
         <CheckMarkers controlState={controlState} setControlState={setControlState} />

@@ -2,7 +2,7 @@ import { getCourses } from "../components/IndexedDB";
 
 export default function MainMenuPage({ setPage, setCurrentCourse }) {
   return (
-    <div className="w-screen h-full flex-col gap-16">
+    <div className="w-screen h-[100dvh] overflow-hidden flex-col gap-16">
       <div className="my-16 mx-16 flex flex-col justify-center items-center">
         <div className="shadow-xl">
           <img src="/logo.png"></img>
