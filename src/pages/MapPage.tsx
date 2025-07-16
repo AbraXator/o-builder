@@ -1,7 +1,7 @@
 import MapView from "../components/MapView";
 import { useState } from 'react';
 import IconForItem from "../helpers/IconGetter";
-import Notification from "../components/Notification";
+import { Notification, NotificationState } from "../components/Notification";
 import { setCourse } from "../components/IndexedDB"
 import ConfirmationModal from "../components/ConfirmationModal";
 import { exportAsImage, ExportDialog } from "../components/ExportCourse";
@@ -101,27 +101,40 @@ function LowerToolbar({ showModal, setShowModal, setPage, currentCourse, setNoti
   }
 
   return (
-    <div className="flex flex-row w-full bg-green p-1">
-      <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={() => setShowModal(true)}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
-      </button>
+    <div className="flex flex-row w-full justify-between bg-green p-1">
+      <div className="flex flex-row w-full justify-center">
+        <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={() => setShowModal(true)}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+        </button>
 
-      <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={saveCurrentCourse}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /><path d="M7 3v4a1 1 0 0 0 1 1h7" /></svg>
-      </button>
+        <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={saveCurrentCourse}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /><path d="M7 3v4a1 1 0 0 0 1 1h7" /></svg>
+        </button>
 
-      <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={() => exportAsImage({ courseToExport: currentCourse })}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M12 12v6" /><path d="m15 15-3-3-3 3" /></svg>    
-      </button>
+        <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-full" onClick={() => exportAsImage({ courseToExport: currentCourse })}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M12 12v6" /><path d="m15 15-3-3-3 3" /></svg>
+        </button>
+      </div>
+
+      <div className="flex flex-row w-full justify-center">
+        <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-xl" onClick={() => setPage("controls")}>
+          Controls
+        </button>
+        <button className="mx-2 p-2 bg-zinc-200 hover:bg-zinc-300 rounded-xl" onClick={() => setPage("controls")}>
+          Routes
+        </button>
+      </div>
     </div>
   )
 }
 
-function MapPage({ setPage, controlState, setControlState, currentCourse, setCurrentCourse }) {
-  const [notificationState, setNotificationState] = useState({
+function MapPage({ setPage, currentCourseState, setCurrentCourseState, currentCourse, setCurrentCourse }) {
+  const [notificationState, setNotificationState] = useState<NotificationState>({
     show: false,
-    message: '',
-    type: ''
+    props: {
+      message: "",
+      type: "error"
+    }
   });
   const [showModal, setShowModal] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -134,7 +147,7 @@ function MapPage({ setPage, controlState, setControlState, currentCourse, setCur
         confirmText={"Exit"}
         onConfirm={() => setPage("main")}
         onCancel={() => setShowModal(false)} />)}
-      {showExportDialog && (<ExportDialog/>)}
+      {showExportDialog && (<ExportDialog />)}
       <div className="flex-shrink-0">
         <UpperToolbar setPage={setPage} controlState={controlState} setControlState={setControlState} currentCourse={currentCourse} setCurrentCourse={setCurrentCourse} />
       </div>

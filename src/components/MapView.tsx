@@ -174,7 +174,7 @@ function getTrimRadius(control, zoom) {
   return pixelRadius / scale; // normal circle
 }
 
-function ControlLines({ sortedControls }) {
+function ControlLines({ sortedControls }: {sortedControls: Control[]}) {
   const map = useMap();
   const [zoom, setZoom] = useState(map.getZoom());
 
@@ -194,7 +194,7 @@ function ControlLines({ sortedControls }) {
 
   const scale = map.getZoomScale(map.getZoom(), 0);
   for (let i = 0; i < sortedControls.length - 1; i++) {
-    let list = [];
+    let list: [number, number][] = [];
     const currentControl = sortedControls[i];
     const nextControl = sortedControls[i + 1];
 
@@ -234,7 +234,7 @@ function StoreMapInstance() {
   const map = useMap();
 
   useEffect(() => {
-    window['map'] = map;
+    window.mapView = map;
   }, [map])
 
   return null;
@@ -268,10 +268,10 @@ export default function MapView({ controlState, setControlState, currentCourse, 
     }));
   };
 
-  const sortedControls = [
-    ...currentCourse.controls.filter(c => c.type === 'start'),
-    ...currentCourse.controls.filter(c => c.type === 'control'),
-    ...currentCourse.controls.filter(c => c.type === 'finish')
+  const sortedControls: Control[] = [
+    ...currentCourse.controls.filter((c: Control) => c.type === 'start'),
+    ...currentCourse.controls.filter((c: Control) => c.type === 'control'),
+    ...currentCourse.controls.filter((c: Control) => c.type === 'finish')
   ]
 
   return (
@@ -280,7 +280,7 @@ export default function MapView({ controlState, setControlState, currentCourse, 
       <MapContainer
         center={[500, 500]}
         zoom={0}
-        crs={L.CRS.Simple}
+        crs={L.CRS.EPSG3857}
         className="w-full h-full"
       >
         <StoreMapInstance />

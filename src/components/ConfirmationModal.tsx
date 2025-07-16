@@ -1,3 +1,12 @@
+type ConfirmationModalProps = {
+  title?: string;
+  message?: string;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+};
+
 export default function ConfirmationModal({ 
   title = "Are you sure?",
   message = "This action cannot be undone.",
@@ -5,7 +14,7 @@ export default function ConfirmationModal({
   cancelText = "Cancel",
   onConfirm,
   onCancel
-}) {
+}: ConfirmationModalProps) {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-lg p-6 w-80 shadow-xl">

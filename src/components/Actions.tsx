@@ -3,6 +3,3 @@ const MapActionType = {
   REMOVE_CONTROL: 'removeControl',
 }
 
-function addControl(control, controls, lastAction, setLastAction) {
-  
-}

@@ -1,13 +1,25 @@
 import { useEffect, useState } from 'react';
 
-export default function Notification({ message, type, onClose, duration = 1000 }) {
+export interface NotificationState {
+  show: boolean;
+  props: NotificationProps;
+}
+
+interface NotificationProps {
+  message: String;
+  type: "error" | "success" | "info";
+  onClose?: () => void;
+  duration?: number;
+}
+
+export function Notification({ message, type, onClose, duration = 1000 }: NotificationProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     setVisible(true);
     const timeout = setTimeout(() => {
       setVisible(false);
-      setTimeout(onClose, 500);
+      if(onClose) setTimeout(onClose, 500);
 
     }, duration);
 

@@ -2,6 +2,16 @@ import html2canvas from 'html2canvas';
 import { map } from 'leaflet';
 import { useState } from 'react';
 
+type exportAsImageProps = {
+  courseToExport: Course;
+  width: number;
+  height: number;
+  filetype: string;
+  paperSize: string;
+  scale: number;
+  dpi: number;
+}
+
 export function ExportDialog() {
   const [exportOptions, setExportOptions] = useState({
     orientation: "",
@@ -21,7 +31,7 @@ export function ExportDialog() {
   )
 }
 
-export async function exportAsImage({ courseToExport, width = 842, height = 595, filetype = "png", paperSize = "A4", scale = 4000, dpi = 300 } = {}) {
+export async function exportAsImage({ courseToExport, width = 842, height = 595, filetype = "png", paperSize = "A4", scale = 4000, dpi = 300 }: exportAsImageProps) {
   const paperSizes = {
     A4: {widthCm: 21, heightCm: 29.7 },
     A5: {widthCm: 14.8, heightCm: 21 },
@@ -29,14 +39,14 @@ export async function exportAsImage({ courseToExport, width = 842, height = 595,
   const mapContainer = document.getElementById('map-container');
   if (!mapContainer) return;
 
-  const controls = document.querySelectorAll('.leaflet-control')
-  const oldDisplay = [];
+  const controls = document.querySelectorAll<HTMLElement>('.leaflet-control')
+  const oldDisplay: string[] = [];
   controls.forEach((c, i) => {
     oldDisplay[i] = c.style.display;
     c.style.display = 'none';
   })
 
-  const map = window['map'];
+  const map = window.mapView;
   const originalWidth = mapContainer.style.width;
   const originalHeight = mapContainer.style.height;
   const originalZoom = map.getZoom();

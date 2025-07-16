@@ -14,7 +14,7 @@ export const initDB = async () => {
   });
 };
 
-export const saveCourse = async (courseData) => {
+export const saveCourse = async (courseData: Course) => {
   const db = await initDB();
   await db.put('courses', {
     ...courseData,
@@ -22,7 +22,7 @@ export const saveCourse = async (courseData) => {
   });
 };
 
-export const setCourse = async (courseData, id) => {
+export const setCourse = async (courseData: Course, id: number) => {
   const db = await initDB();
   await db.put('courses', {...courseData, id})
 }
@@ -32,7 +32,7 @@ export const getCourses = async () => {
   return await db.getAll('courses');
 }
 
-export const deleteCourse = async (id) => {
+export const deleteCourse = async (id: number) => {
   const db = await initDB();
   return await db.delete('courses', id);
 }
