@@ -1,50 +1,47 @@
 import { MapContainer, ImageOverlay, useMapEvent, Marker, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import { useState, useEffect } from 'react';
-import Notification from './Notification';
+import { Notification, NotificationState } from './Notification';
 import ConfirmationModal from './ConfirmationModal';
+import { getControlsFromRoute } from '../helpers/CourseHook';
+import type { LatLngBoundsExpression } from 'leaflet';
 
 const imageUrl = '/maps/mapa.png';
-const imageBounds = [[0, 0], [595, 842]];
+const imageBounds: LatLngBoundsExpression = [[0, 0], [595, 842]];
 const controlIcon = L.icon({
   iconUrl: '/symbols/control.png',
   iconSize: [256, 256],
   iconAnchor: [128, 128]
 });
 
-function ControlPlacer({ onPlace }) {
-  useMapEvent({
-    click(e) {
-      const { lat, lng } = e.latlng;
-      onPlace([lat, lng]);
-    },
-  });
+type currentCourseStateProps = {
+
 }
 
-function MapClickHandler({ controlState, setControlState }) {
+function ControlPlacer({ onPlace }: { onPlace: (coords: [number, number]) => void }) {
+  useMapEvent('click', (e) => {
+    const { lat, lng } = e.latlng;
+    onPlace([lat, lng]);
+  });
+
+  return null;
+}
+
+function MapClickHandler({ currentCourseState, setCurrentCourseState }: { currentCourseState: CourseState, setCurrentCourseState: SetState<CourseState> }) {
   useMapEvent('click', () => {
-    if (controlState.mode === 'selecting') {
-      setControlState((prev) => ({ ...prev, selectedControl: undefined }));
+    if (currentCourseState.mode === 'selecting') {
+      setCurrentCourseState((prev) => ({ ...prev, selectedControl: null }));
     }
   });
   return null;
 }
 
-function CheckMarkers({ controlState, setControlState }) {
-  const map = useMap();
-  useMapEvent('click', () => {
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        console.log(layer.getElement);
-      }
-    });
-  });
-  return (
-    <></>
-  )
-}
-
-function ZoomAwareIcon({ index, controlState, setControlState, sortedControls }) {
+function ZoomAwareIcon({ index, currentCourseState, setCurrentCourseState, sortedControls }: {
+  index: number,
+  currentCourseState: CourseState,
+  setCurrentCourseState: SetState<CourseState>,
+  sortedControls: Control[]
+}) {
   const map = useMap();
   const [zoom, setZoom] = useState(map.getZoom());
   const control = sortedControls[index];
@@ -64,7 +61,7 @@ function ZoomAwareIcon({ index, controlState, setControlState, sortedControls })
   //const size = Math.max(24, 48 - (36 - zoom) * 4);
   const size = 32;
 
-  const isControlSelected = controlState.selectedControl === index;
+  const isControlSelected = currentCourseState.selectedControl === index;
   //const size = 32;
   const startIcon = L.divIcon({
     className: '',
@@ -149,18 +146,18 @@ function ZoomAwareIcon({ index, controlState, setControlState, sortedControls })
     <Marker
       position={control.coords}
       icon={control.type === 'start' ? startIcon : control.type === 'control' ? controlIcon : finishIcon}
-      interactive={controlState.mode !== 'placing'}
+      interactive={currentCourseState.mode !== 'placing'}
       eventHandlers={{
         click: () => {
-          if (controlState.mode !== 'selecting') return;
-          setControlState((prev) => ({ ...prev, selectedControl: index }));
+          if (currentCourseState.mode !== 'selecting') return;
+          setCurrentCourseState((prev) => ({ ...prev, selectedControl: index }));
         },
       }}
     />
   );
 }
 
-function getTrimRadius(control, zoom) {
+function getTrimRadius(control: Control, zoom: number) {
   const pixelRadius = 32 / 2;
   const map = useMap();
   const scale = map.getZoomScale(zoom, 0);
@@ -174,7 +171,7 @@ function getTrimRadius(control, zoom) {
   return pixelRadius / scale; // normal circle
 }
 
-function ControlLines({ sortedControls }: {sortedControls: Control[]}) {
+function ControlLines({ sortedControls }: { sortedControls: Control[] }) {
   const map = useMap();
   const [zoom, setZoom] = useState(map.getZoom());
 
@@ -210,7 +207,7 @@ function ControlLines({ sortedControls }: {sortedControls: Control[]}) {
       let dx = nextControl.coords[0] - currentControl.coords[0];
       let dy = nextControl.coords[1] - currentControl.coords[1]
       let lenght = Math.sqrt(dx * dx + dy * dy);
-      if(lenght < 12) continue;
+      if (lenght < 12) continue;
       let unitX = dx / lenght;
       let unitY = dy / lenght;
       let newAx = currentControl.coords[0] + unitX * r1
@@ -240,11 +237,19 @@ function StoreMapInstance() {
   return null;
 }
 
-export default function MapView({ controlState, setControlState, currentCourse, setCurrentCourse, notificationState, setNotificationState }) {
-  const handleAddControl = (position) => {
-    if (controlState.mode !== 'placing') return;
+export default function MapView({ currentCourseState, setCurrentCourseState, currentCourse, setCurrentCourse, notificationState, setNotificationState }: {
+  currentCourseState: CourseState,
+  setCurrentCourseState: SetState<CourseState>,
+  currentCourse: Course,
+  setCurrentCourse: SetState<Course>,
+  notificationState: NotificationState,
+  setNotificationState: SetState<NotificationState>
+}) {
+  const controls = getControlsFromRoute(currentCourse, currentCourseState.currentRoute);
+  const handleAddControl = (position: [number, number]) => {
+    if (currentCourseState.mode !== 'placing') return;
 
-    if (controlState.selectedItemType === 'start' && currentCourse.controls.some(c => c.type === 'start')) {
+    if (currentCourseState.selectedControlType === 'start' && controls.some(c => c.type === 'start')) {
       setNotificationState({
         show: true,
         message: 'Only one start control can be placed.',
@@ -253,7 +258,7 @@ export default function MapView({ controlState, setControlState, currentCourse, 
       return;
     }
 
-    if (controlState.selectedItemType === 'finish' && currentCourse.controls.some(c => c.type === 'finish')) {
+    if (currentCourseState.selectedControlType === 'finish' && controls.some(c => c.type === 'finish')) {
       setNotificationState({
         show: true,
         message: 'Only one finish control can be placed.',
@@ -264,14 +269,14 @@ export default function MapView({ controlState, setControlState, currentCourse, 
 
     setCurrentCourse((prev) => ({
       ...prev,
-      controls: [...prev.controls, { type: controlState.selectedItemType, coords: position }],
+      controls: [...getControlsFromRoute(prev, currentCourseState.currentRoute), { type: currentCourseState.selectedControlType, coords: position }],
     }));
   };
 
   const sortedControls: Control[] = [
-    ...currentCourse.controls.filter((c: Control) => c.type === 'start'),
-    ...currentCourse.controls.filter((c: Control) => c.type === 'control'),
-    ...currentCourse.controls.filter((c: Control) => c.type === 'finish')
+    ...controls.filter((c: Control) => c.type === 'start'),
+    ...controls.filter((c: Control) => c.type === 'control'),
+    ...controls.filter((c: Control) => c.type === 'finish')
   ]
 
   return (
@@ -284,12 +289,11 @@ export default function MapView({ controlState, setControlState, currentCourse, 
         className="w-full h-full"
       >
         <StoreMapInstance />
-        <ImageOverlay url={currentCourse.map} bounds={imageBounds} className='cursor-default'/>
+        <ImageOverlay url={currentCourse.map} bounds={imageBounds} className='cursor-default' />
         <ControlPlacer onPlace={handleAddControl} />
-        <CheckMarkers controlState={controlState} setControlState={setControlState} />
-        <MapClickHandler controlState={controlState} setControlState={setControlState} />
+        <MapClickHandler currentCourseState={currentCourseState} setCurrentCourseState={setCurrentCourseState} />
         {sortedControls.map(({ coords }, index) => (
-          <ZoomAwareIcon key={`${index}-${controlState.mode}`} index={index} controlState={controlState} setControlState={setControlState} sortedControls={sortedControls} />
+          <ZoomAwareIcon key={`${index}-${currentCourseState.mode}`} index={index} currentCourseState={currentCourseState} setCurrentCourseState={setCurrentCourseState} sortedControls={sortedControls} />
         ))}
         <ControlLines sortedControls={sortedControls} />
 

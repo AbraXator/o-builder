@@ -1,4 +1,4 @@
-function ControlsGrid({ currentCourse }) {
+function ControlsGrid({ currentCourse }: { currentCourse: Course }) {
   return (
     <div className="grid grid-row-3 gap-0 grid-cols-8 border-2">
       <div className="border border-b-2 col-span-8 text-center font-bold">{currentCourse.name}</div>
@@ -10,7 +10,7 @@ function ControlsGrid({ currentCourse }) {
   )
 }
 
-function ControlsPage({ setPage, currentCourse, setCurrentCourse }) {
+function ControlsPage({ setPage, currentCourse, setCurrentCourse }: { setPage: }) {
   return (
     <div className="h-[100dvh] w-full">
       <div className="flex flex-row justify-left items-center p-4 w-full h-16 bg-zinc-100 shadow-lg">
