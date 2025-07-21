@@ -1,9 +1,6 @@
-declare global {
-  const enum InteractionModes {
-    SELECTING = "selecting",
-    PLACING = "placing",
-  } 
+import { InteractionModes } from "../enums"; 
 
+declare global {
   type InteractionMode = typeof InteractionModes[keyof typeof InteractionModes];
 
   interface CourseState {

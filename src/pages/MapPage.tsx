@@ -6,15 +6,15 @@ import { setCourse } from "../components/IndexedDB"
 import ConfirmationModal from "../components/ConfirmationModal";
 import { exportAsImage, ExportDialog } from "../components/ExportCourse";
 import { appState } from "../store";
-
-const currentCourseState = appState((s) => s.currentCourseState);
-const currentCourse = appState((s) => s.currentCourse);
-const setPage = appState((s) => s.setPage);
-const updateCurrentCourseState = appState((s) => s.updateCurrentCourseState);
-const updateRoute = appState((s) => s.updateRoute);
-const updateCurrentCourse = appState((s) => s.updateCurrentCourse);
+import { Pages, InteractionModes } from "../types/enums";
 
 function UpperToolbar() {
+  const currentCourseState = appState((s) => s.currentCourseState);
+  const currentCourse = appState((s) => s.currentCourse);
+  const updateRoute = appState((s) => s.updateRoute);
+  const updateCurrentCourseState = appState((s) => s.updateCurrentCourseState);
+  const setPage = appState((s) => s.setPage);
+
   const buttonProperties = {
     className: "flex-1 text-zinc-800 font-semibold py-2 px-4 rounded"
   };
@@ -101,11 +101,14 @@ function UpperToolbar() {
   )
 }
 
-function LowerToolbar({ showModal, setShowModal, setNotificationState }: {
+function LowerToolbar({ showModal, setShowModal, setNotificationState, setShowExportDialog }: {
   showModal: boolean,
   setShowModal: SetState<boolean>,
   setNotificationState: SetState<NotificationState>,
+  setShowExportDialog: SetState<boolean>
 }) {
+  const currentCourse = appState((s) => s.currentCourse);
+  const setPage = appState((s) => s.setPage);
   const saveCurrentCourse = () => {
     const id = currentCourse.id;
     if (!id) {
@@ -155,6 +158,8 @@ function LowerToolbar({ showModal, setShowModal, setNotificationState }: {
 }
 
 function MapPage() {
+  const setPage = appState((s) => s.setPage);
+
   const [notificationState, setNotificationState] = useState<NotificationState>({
     show: false,
     message: "",
@@ -169,7 +174,7 @@ function MapPage() {
         title={"Exit to main page?"}
         message={"Any unsaved changes will be lost"}
         confirmText={"Exit"}
-        onConfirm={() => setPage("main")}
+        onConfirm={() => setPage(Pages.MAIN)}
         onCancel={() => setShowModal(false)} />)}
       {showExportDialog && (<ExportDialog />)}
       <div className="flex-shrink-0">
@@ -178,12 +183,12 @@ function MapPage() {
       {notificationState.show && (
         <Notification
           message={notificationState.message}
-          onClose={() => setNotificationState({ show: false, message: '', type: "info"})}
+          onClose={() => setNotificationState({ show: false, message: '', type: "info" })}
           type={notificationState.type}
         />
       )}
       <div className="h-full min-h-0 flex-grow overflow-hidden">
-        <MapView controlState={controlState} setControlState={setControlState} currentCourse={currentCourse} setCurrentCourse={setCurrentCourse} notificationState={notificationState} setNotificationState={setNotificationState} />
+        <MapView notificationState={notificationState} setNotificationState={setNotificationState} />
       </div>
 
       <div className="flex-shrink-0">

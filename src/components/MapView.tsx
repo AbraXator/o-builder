@@ -5,6 +5,7 @@ import { Notification, NotificationState } from './Notification';
 import ConfirmationModal from './ConfirmationModal';
 import { getControlsFromRoute } from '../helpers/CourseHook';
 import type { LatLngBoundsExpression } from 'leaflet';
+import { appState } from '../store';
 
 const imageUrl = '/maps/mapa.png';
 const imageBounds: LatLngBoundsExpression = [[0, 0], [595, 842]];
@@ -13,10 +14,6 @@ const controlIcon = L.icon({
   iconSize: [256, 256],
   iconAnchor: [128, 128]
 });
-
-type currentCourseStateProps = {
-
-}
 
 function ControlPlacer({ onPlace }: { onPlace: (coords: [number, number]) => void }) {
   useMapEvent('click', (e) => {
@@ -27,21 +24,24 @@ function ControlPlacer({ onPlace }: { onPlace: (coords: [number, number]) => voi
   return null;
 }
 
-function MapClickHandler({ currentCourseState, setCurrentCourseState }: { currentCourseState: CourseState, setCurrentCourseState: SetState<CourseState> }) {
+function MapClickHandler() {
+  const currentCourseState = appState((s) => s.currentCourseState);
+  const updateCurrentCourseState = appState((s) => s.updateCurrentCourseState);
+
   useMapEvent('click', () => {
     if (currentCourseState.mode === 'selecting') {
-      setCurrentCourseState((prev) => ({ ...prev, selectedControl: null }));
+      updateCurrentCourseState({ selectedControl: null });
     }
   });
+
   return null;
 }
 
-function ZoomAwareIcon({ index, currentCourseState, setCurrentCourseState, sortedControls }: {
+function ZoomAwareIcon({ index, sortedControls }: {
   index: number,
-  currentCourseState: CourseState,
-  setCurrentCourseState: SetState<CourseState>,
   sortedControls: Control[]
 }) {
+  const currentCourseState = appState((s) => s.currentCourseState);
   const map = useMap();
   const [zoom, setZoom] = useState(map.getZoom());
   const control = sortedControls[index];
@@ -142,6 +142,8 @@ function ZoomAwareIcon({ index, currentCourseState, setCurrentCourseState, sorte
     iconAnchor: [size / 2, size / 2],
   });
 
+  const updateCurrentCourseState = appState((s) => s.updateCurrentCourseState);
+
   return (
     <Marker
       position={control.coords}
@@ -150,7 +152,7 @@ function ZoomAwareIcon({ index, currentCourseState, setCurrentCourseState, sorte
       eventHandlers={{
         click: () => {
           if (currentCourseState.mode !== 'selecting') return;
-          setCurrentCourseState((prev) => ({ ...prev, selectedControl: index }));
+          updateCurrentCourseState({ selectedControl: index });
         },
       }}
     />
@@ -237,15 +239,14 @@ function StoreMapInstance() {
   return null;
 }
 
-export default function MapView({ currentCourseState, setCurrentCourseState, currentCourse, setCurrentCourse, notificationState, setNotificationState }: {
-  currentCourseState: CourseState,
-  setCurrentCourseState: SetState<CourseState>,
-  currentCourse: Course,
-  setCurrentCourse: SetState<Course>,
+export default function MapView({ notificationState, setNotificationState }: {
   notificationState: NotificationState,
   setNotificationState: SetState<NotificationState>
 }) {
-  const controls = getControlsFromRoute(currentCourse, currentCourseState.currentRoute);
+  const currentCourse = appState((s) => s.currentCourse);
+  const currentCourseState = appState((s) => s.currentCourseState);
+  const updateRoute = appState((s) => s.updateRoute);
+  const controls: Control[] = getControlsFromRoute(currentCourse, currentCourseState.currentRoute);
   const handleAddControl = (position: [number, number]) => {
     if (currentCourseState.mode !== 'placing') return;
 
@@ -267,10 +268,14 @@ export default function MapView({ currentCourseState, setCurrentCourseState, cur
       return;
     }
 
-    setCurrentCourse((prev) => ({
-      ...prev,
-      controls: [...getControlsFromRoute(prev, currentCourseState.currentRoute), { type: currentCourseState.selectedControlType, coords: position }],
-    }));
+    updateRoute(
+      currentCourseState.currentRoute, {
+      controls: [...getControlsFromRoute(currentCourse, currentCourseState.currentRoute), {
+        type: currentCourseState.selectedControlType,
+        coords: position
+      }],
+    }
+    );
   };
 
   const sortedControls: Control[] = [
@@ -291,9 +296,9 @@ export default function MapView({ currentCourseState, setCurrentCourseState, cur
         <StoreMapInstance />
         <ImageOverlay url={currentCourse.map} bounds={imageBounds} className='cursor-default' />
         <ControlPlacer onPlace={handleAddControl} />
-        <MapClickHandler currentCourseState={currentCourseState} setCurrentCourseState={setCurrentCourseState} />
+        <MapClickHandler />
         {sortedControls.map(({ coords }, index) => (
-          <ZoomAwareIcon key={`${index}-${currentCourseState.mode}`} index={index} currentCourseState={currentCourseState} setCurrentCourseState={setCurrentCourseState} sortedControls={sortedControls} />
+          <ZoomAwareIcon key={`${index}-${currentCourseState.mode}`} index={index} sortedControls={sortedControls} />
         ))}
         <ControlLines sortedControls={sortedControls} />
 

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Pages } from './types/enums';
 
 interface AppState {
   currentCourse: Course;
@@ -16,7 +17,7 @@ interface AppState {
 
 export const appState = create<AppState>((set) => ({
   currentCourse: {
-    id: null,
+    id: undefined,
     name: "",
     scale: null,
     map: "",

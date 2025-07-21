@@ -1,6 +1,7 @@
 import { use, useState } from "react";
 import { saveCourse, getCourses } from "../components/IndexedDB"
 import { appState } from "../store";
+import { Pages } from "../types/enums";
 
 interface FormData {
   courseName: string,

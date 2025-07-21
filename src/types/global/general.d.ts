@@ -1,21 +1,7 @@
-declare global {
-  enum ControlTypes {
-    START = "start",
-    CONTROL = "control",
-    FINISH = "finish"
-  }
+import { Pages, ControlTypes } from "../enums";
 
+declare global {
   type ControlType = typeof ControlTypes[keyof typeof ControlTypes];
-  
-  enum Pages {
-    MAIN = "main",
-    CREATE_COURSE = "createCourse",
-    RECENT = "recent",
-    MAP = "map",
-    ITEMS = "items",
-    CONTROLS = "controls",
-    ROUTES = "routes",
-  }
 
   type Page = typeof Pages[keyof typeof Pages];
 

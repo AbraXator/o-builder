@@ -3,10 +3,11 @@ import ConfirmationModal from "../components/ConfirmationModal"
 import { useEffect, useState } from "react";
 import { appState } from "../store";
 import { Notification, NotificationState } from "../components/Notification";
-
-const setPage = appState((s) => s.setPage);
+import { Pages } from "../types/enums";
 
 function RecentCourseComponent() {
+  const setPage = appState((s) => s.setPage);
+
   const [courses, setCourses] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
@@ -103,6 +104,8 @@ function RecentCourseComponent() {
 }
 
 function RecentCoursesPage() {
+  const setPage = appState((s) => s.setPage);
+
   return (
     <div className="flex flex-col w-full h-full justify-center overflow-hidden">
       <div className="flex flex-row justify-between items-center p-4 w-full h-16 bg-zinc-100 shadow-lg">

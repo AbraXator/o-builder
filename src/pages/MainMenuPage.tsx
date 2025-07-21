@@ -1,5 +1,6 @@
 import { getCourses } from "../components/IndexedDB";
 import { appState } from "../store";
+import { Pages } from "../types/enums";
 
 export default function MainMenuPage() {
   const setPage = appState((s) => s.setPage);
