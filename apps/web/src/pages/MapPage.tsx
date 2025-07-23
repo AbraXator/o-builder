@@ -5,7 +5,7 @@ import { Notification, NotificationState } from "../components/Notification";
 import { setCourse } from "../components/IndexedDB"
 import ConfirmationModal from "../components/ConfirmationModal";
 import { exportAsImage, ExportDialog } from "../components/ExportCourse";
-import { appState } from "../store";
+import { appState } from "../../../../libs/state/store";
 import { Pages, InteractionModes } from "../types/enums";
 
 function UpperToolbar() {

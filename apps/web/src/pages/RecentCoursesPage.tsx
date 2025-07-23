@@ -1,7 +1,7 @@
 import { getCourses, deleteCourse } from "../components/IndexedDB"
 import ConfirmationModal from "../components/ConfirmationModal"
 import { useEffect, useState } from "react";
-import { appState } from "../store";
+import { appState } from "../../../../libs/state/store";
 import { Notification, NotificationState } from "../components/Notification";
 import { Pages } from "../types/enums";
 
@@ -18,7 +18,7 @@ function RecentCourseComponent() {
     const courses = await getCourses();
     if (courses.length > 0) {
       setCourses(courses)
-    } else {
+    } else { 
       setCourses("-")
     }
   }

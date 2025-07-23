@@ -1,4 +1,4 @@
-import { appState } from "../store";
+import { appState } from "../../../../libs/state/store";
 import { Pages, ControlTypes } from "../types/enums";
 
 

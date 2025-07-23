@@ -5,7 +5,7 @@ import { Notification, NotificationState } from './Notification';
 import ConfirmationModal from './ConfirmationModal';
 import { getControlsFromRoute } from '../helpers/CourseHook';
 import type { LatLngBoundsExpression } from 'leaflet';
-import { appState } from '../store';
+import { appState } from '../../../../libs/state/store';
 
 const imageUrl = '/maps/mapa.png';
 const imageBounds: LatLngBoundsExpression = [[0, 0], [595, 842]];

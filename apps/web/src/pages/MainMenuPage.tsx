@@ -1,5 +1,5 @@
 import { getCourses } from "../components/IndexedDB";
-import { appState } from "../store";
+import { appState } from "../../../../libs/state/store";
 import { Pages } from "../types/enums";
 
 export default function MainMenuPage() {

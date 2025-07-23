@@ -9,10 +9,10 @@
     "skipLibCheck": true
   },
   "include": [
-    "src",
-    "src/types/global/general.d.ts",
-    "src/types/global/course.d.ts",
-    "src/types/global/courseState.d.ts",
-    "src/types/global/route.d.ts"
-  ]
+    "apps/web/src",
+    "apps/web/src/types/global/general.d.ts",
+    "apps/web/src/types/global/course.d.ts",
+    "apps/web/src/types/global/courseState.d.ts",
+    "apps/web/src/types/global/route.d.ts"
+, "libs/state/store.ts"  ]
 }

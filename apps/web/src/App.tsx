@@ -5,7 +5,7 @@ import MainMenuPage from './pages/MainMenuPage';
 import CreateCoursePage from './pages/CreateCoursePage';
 import RecentCoursesPage from './pages/RecentCoursesPage';
 import ControlsPage from './pages/ControlsPage';
-import { appState } from './store';
+import { appState } from '../../../libs/state/store';
 
 function App() {
   const [lastAction, setLastAction] = useState([null]); // 'addControl', 'removeControl'
